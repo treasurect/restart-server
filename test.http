@@ -1,0 +1,11 @@
+#POST http://localhost:8080/api/user/loginPwd
+GET http://localhost:8080/api/user/info
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNzg5Njk2NzgzLCJleHAiOjE3OTAzMDE1ODN9.yz16Ms0I2QveYm6NERVAX0fJ2eb0nSuKNrrqByiILyE
+
+Content-Type: application/json
+
+{
+  "username": "treasure12",
+  "password": "123456",
+  "nickname": "Treasure"
+}
