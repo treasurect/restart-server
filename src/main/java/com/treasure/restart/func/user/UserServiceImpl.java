@@ -4,9 +4,8 @@ import com.treasure.restart.dto.UserLoginRequest;
 import com.treasure.restart.dto.UserLoginResponse;
 import com.treasure.restart.entity.User;
 import com.treasure.restart.helper.JwtUtils;
-import jakarta.annotation.Resource;
+import com.treasure.restart.helper.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,50 +13,66 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Resource
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Resource
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    private final JwtUtils jwtUtils;
 
     @Override
     public UserLoginResponse loginPwd(UserLoginRequest request) {
 
         User existingUser = userMapper.findByUsername(request.getUsername());
 
+        // 用户不存在 → 注册并登录
         if (existingUser == null) {
+
             User newUser = new User();
+
             newUser.setUsername(request.getUsername());
+
             newUser.setPassword(
                     passwordEncoder.encode(request.getPassword())
             );
+
             newUser.setNickname(request.getNickname());
+
             newUser.setStatus(1);
 
             userMapper.insertUser(newUser);
+
             return generateResponse(newUser);
         }
 
-        // 用户存在 → 验证密码
+        // 用户存在 → 检查用户状态
+        if (existingUser.getStatus() == 0) {
+            throw new BusinessException("账号已被禁用");
+        }
+
+        // 验证密码
         boolean matches = passwordEncoder.matches(
                 request.getPassword(),
                 existingUser.getPassword()
         );
 
         if (!matches) {
-            throw new IllegalArgumentException("密码错误");
+            throw new BusinessException("密码错误");
         }
 
         return generateResponse(existingUser);
     }
 
-    private static @NonNull UserLoginResponse generateResponse(User newUser) {
-        String token = JwtUtils.generateToken(newUser.getId());
+    private UserLoginResponse generateResponse(User user) {
+
+        String token = jwtUtils.generateToken(user.getId());
+
         UserLoginResponse response = new UserLoginResponse();
+
         response.setToken(token);
-        response.setUserId(newUser.getId());
-        response.setUsername(newUser.getUsername());
-        response.setNickname(newUser.getNickname());
+        response.setUserId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setNickname(user.getNickname());
+
         return response;
     }
 }
