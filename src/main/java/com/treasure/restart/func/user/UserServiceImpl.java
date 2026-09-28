@@ -1,9 +1,12 @@
 package com.treasure.restart.func.user;
 
+import com.treasure.restart.dto.UserInfoResponse;
 import com.treasure.restart.dto.UserLoginRequest;
 import com.treasure.restart.dto.UserLoginResponse;
+import com.treasure.restart.dto.UserUpdateRequest;
 import com.treasure.restart.entity.User;
 import com.treasure.restart.helper.JwtUtils;
+import com.treasure.restart.helper.UserContext;
 import com.treasure.restart.helper.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +64,45 @@ public class UserServiceImpl implements UserService {
 
         return generateResponse(existingUser);
     }
+
+    @Override
+    public UserInfoResponse getUserInfo() {
+        Long userId = UserContext.getUserId();
+        User curentUser = userMapper.findByUserId(userId);
+        if (curentUser == null) {
+            throw new BusinessException(404,"用户不存在");
+        }
+        UserInfoResponse response = new UserInfoResponse();
+        response.setUserId(curentUser.getId());
+        response.setUsername(curentUser.getUsername());
+        response.setNickname(curentUser.getNickname());
+        response.setAvatar(curentUser.getAvatar());
+        return response;
+    }
+
+    @Override
+    public Boolean updateUserInfo(UserUpdateRequest request) {
+        Long userId = UserContext.getUserId();
+        int rows = userMapper.updateUserInfo(userId, request.getNickname(), request.getAvatar());
+        if (rows == 0) throw new BusinessException(404,"用户不存在");
+
+        return true;
+    }
+
+    @Override
+    public Boolean delete() {
+        return delete(UserContext.getUserId());
+    }
+
+    @Override
+    public Boolean delete(Long userId) {
+        int rows = userMapper.delete(userId);
+        if (rows == 0) {
+            throw new BusinessException(404,"用户不存在");
+        }
+        return true;
+    }
+
 
     private UserLoginResponse generateResponse(User user) {
 

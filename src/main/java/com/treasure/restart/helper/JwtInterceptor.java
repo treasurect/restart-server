@@ -1,6 +1,8 @@
 package com.treasure.restart.helper;
 
 import com.treasure.restart.base.BaseResponse;
+import com.treasure.restart.entity.User;
+import com.treasure.restart.func.user.UserMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +20,8 @@ public class JwtInterceptor implements HandlerInterceptor {
     private JwtUtils jwtUtils;
     @Resource
     private ObjectMapper objectMapper;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -32,6 +36,13 @@ public class JwtInterceptor implements HandlerInterceptor {
             }
             String token = authorization.substring(bearer_.length());
             Long userId = jwtUtils.getUserId(token);
+            User user = userMapper.findByUserId(userId);
+            if (user == null) {
+                return unauthorized(response,"用户不存在");
+            }
+            if (user.getStatus() == 0) {
+                return unauthorized(response, "账号已失效");
+            }
             //request.setAttribute("userId", userId);
             UserContext.setUserId(userId);
             return true;
