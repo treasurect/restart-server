@@ -3,6 +3,7 @@ package com.treasure.restart.func.file;
 import com.treasure.restart.base.BaseResponse;
 import com.treasure.restart.helper.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,15 +22,23 @@ import java.util.UUID;
 @RequestMapping("/api/file")
 public class FileController {
 
+    private final String uploadPath;
+    private final String accessUrl;
+    public FileController(
+            @Value("${file.upload-path}") String uploadPath,
+            @Value("${file.access-url}") String accessUrl
+    ){
+        this.uploadPath = uploadPath;
+        this.accessUrl = accessUrl;
+    }
+
     @PostMapping("/upload")
-    public BaseResponse<List<String>> upload(
-            @RequestParam("files") List<MultipartFile> files
-    ) {
+    public BaseResponse<List<String>> upload(@RequestParam("files") List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
             throw new BusinessException(400, "文件不能为空");
         }
 
-        List<String> fileNames = new ArrayList<>();
+        List<String> wholeUrls = new ArrayList<>();
 
         for (MultipartFile file : files) {
 
@@ -38,7 +47,7 @@ public class FileController {
             }
 
             try {
-                Path path = Paths.get("/opt/restart-server/uploads");
+                Path path = Paths.get(uploadPath);
 
                 if (!Files.exists(path)) {
                     Files.createDirectories(path);
@@ -61,13 +70,13 @@ public class FileController {
 
                 file.transferTo(target);
 
-                fileNames.add(fileName);
+                wholeUrls.add(accessUrl + fileName);
 
             } catch (IOException e) {
                 throw new BusinessException(500, "文件上传失败");
             }
         }
 
-        return BaseResponse.success("上传成功", fileNames);
+        return BaseResponse.success("上传成功", wholeUrls);
     }
 }

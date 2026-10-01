@@ -23,6 +23,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:/opt/restart-server/uploads/");
+                .addResourceLocations("file:${file.upload-path}/");
     }
 }
