@@ -4,6 +4,7 @@ import com.treasure.restart.dto.MomentListResponse;
 import com.treasure.restart.dto.MomentPublishRequest;
 import com.treasure.restart.entity.Moment;
 import com.treasure.restart.entity.MomentImage;
+import com.treasure.restart.entity.MomentListRow;
 import com.treasure.restart.helper.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,18 +55,29 @@ public class MomentServiceImpl implements MomentService {
 
     @Override
     public MomentListResponse getMomentList(Integer page, Integer size) {
-        long count = momentMapper.getCount();
-        MomentListResponse momentListResponse = new MomentListResponse();
-        momentListResponse.setPage(page);
-        momentListResponse.setTotal(count);
-
-        int offset = (page - 1) * size;
-        List<Moment> momentList = momentMapper.getList(offset, size);
-        if (momentList == null || momentList.isEmpty()) {
-            momentListResponse.setMomentList(Collections.emptyList());
-            return momentListResponse;
+        if (page == null || page < 1) {
+            throw new BusinessException(400, "页码必须大于0");
         }
-        List<Long> momentIds = momentList.stream().map(Moment::getId).toList();
+
+        if (size == null || size < 1 || size > 50) {
+            throw new BusinessException(400, "每页条数必须在1到50之间");
+        }
+        long total = momentMapper.getCount();
+        long totalPages = (total + size - 1) / size;
+        MomentListResponse listResponse = new MomentListResponse();
+        listResponse.setPage(page);
+        listResponse.setSize(size);
+        listResponse.setTotalPages(totalPages);
+        listResponse.setTotal(total);
+        listResponse.setHasMore(page < totalPages);
+
+        long offset = (long) (page - 1) * size;
+        List<MomentListRow> momentListRows = momentMapper.getList(offset, size);
+        if (momentListRows == null || momentListRows.isEmpty()) {
+            listResponse.setMomentList(Collections.emptyList());
+            return listResponse;
+        }
+        List<Long> momentIds = momentListRows.stream().map(MomentListRow::getId).toList();
         List<MomentImage> imageList = momentImageMapper.selectByMomentIds(momentIds);
         Map<Long, List<String>> imageMap = imageList.stream().collect(
                 Collectors.groupingBy(
@@ -74,15 +86,18 @@ public class MomentServiceImpl implements MomentService {
                 )
         );
         List<MomentListResponse.MomentItemResponse> items = new ArrayList<>();
-        for (Moment moment : momentList) {
-            MomentListResponse.MomentItemResponse momentItemResponse = new MomentListResponse.MomentItemResponse();
-            momentItemResponse.setContent(moment.getContent());
-            momentItemResponse.setCreatedAt(moment.getCreatedAt());
-            momentItemResponse.setId(moment.getId());
-            momentItemResponse.setImages(imageMap.getOrDefault(moment.getId(), Collections.emptyList()));
-            items.add(momentItemResponse);
+        for (MomentListRow momentRow : momentListRows) {
+            MomentListResponse.MomentItemResponse itemResponse = new MomentListResponse.MomentItemResponse();
+            itemResponse.setId(momentRow.getId());
+            itemResponse.setUserId(momentRow.getUserId());
+            itemResponse.setUsername(momentRow.getUserName());
+            itemResponse.setUserAvatar(momentRow.getUserAvatar());
+            itemResponse.setContent(momentRow.getContent());
+            itemResponse.setImages(imageMap.getOrDefault(momentRow.getId(), Collections.emptyList()));
+            itemResponse.setCreatedAt(momentRow.getCreatedAt());
+            items.add(itemResponse);
         }
-        momentListResponse.setMomentList(items);
-        return momentListResponse;
+        listResponse.setMomentList(items);
+        return listResponse;
     }
 }

@@ -6,13 +6,14 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface UserMapper {
 
-    @Select("SELECT id, username, password, nickname, avatar, status, created_at, updated_at " +
+    @Select("SELECT id, username, password, nickname, avatar, status, created_at, updated_at, cover_url AS coverUrl " +
             "FROM `sys_user` WHERE username = #{username} LIMIT 1")
     User findByUsername(String username);
 
-    @Select("SELECT id, username, password, nickname, avatar, status, created_at, updated_at " +
-            "FROM `sys_user` WHERE id = #{userId} LIMIT 1")
-    User findByUserId(Long userId);
+    @Select("SELECT id, username, password, nickname, avatar, status, " +
+            "created_at, updated_at, cover_url AS coverUrl " +
+            "FROM sys_user WHERE id = #{userId} LIMIT 1")
+    User findByUserId(@Param("userId") Long userId);
 
     @Insert("INSERT INTO `sys_user` (username, password, nickname, avatar, status, created_at, updated_at) " +
             "VALUES (#{username}, #{password}, #{nickname}, #{avatar}, #{status}, NOW(), NOW())")

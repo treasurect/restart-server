@@ -1,5 +1,6 @@
 package com.treasure.restart.func.moment;
 
+import com.treasure.restart.base.BaseResponse;
 import com.treasure.restart.dto.MomentPublishRequest;
 import com.treasure.restart.helper.UserContext;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +15,8 @@ public class MomentController {
 
     @PostMapping("/publish")
     public Object publish(@RequestBody MomentPublishRequest momentPublishRequest) {
-        Long monmentId = momentService.publish(UserContext.getUserId(), momentPublishRequest);
-        return monmentId;
+        Long momentId = momentService.publish(UserContext.getUserId(), momentPublishRequest);
+        return BaseResponse.success("发布成功", momentId.toString());
     }
 
     @GetMapping("/list")
@@ -23,6 +24,6 @@ public class MomentController {
             @RequestParam(defaultValue = "1")Integer page,
             @RequestParam(defaultValue = "10") Integer size
     ) {
-        return momentService.getMomentList(page, size);
+        return BaseResponse.success("获取列表成功",momentService.getMomentList(page, size));
     }
 }
