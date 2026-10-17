@@ -3,6 +3,7 @@ package com.treasure.restart.func.moment;
 import com.treasure.restart.dto.MomentListResponse;
 import com.treasure.restart.dto.MomentPublishRequest;
 import com.treasure.restart.entity.Moment;
+import org.apache.ibatis.annotations.Param;
 
 public interface MomentService {
 
@@ -19,5 +20,7 @@ public interface MomentService {
     /**
      * 查询朋友圈列表
      */
-     MomentListResponse getMomentList(Integer page, Integer size);
+     MomentListResponse getMomentList(Integer page, Integer size, @Param("type") String type);
+
+
 }

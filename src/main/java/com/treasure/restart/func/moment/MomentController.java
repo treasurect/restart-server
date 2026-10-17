@@ -22,8 +22,9 @@ public class MomentController {
     @GetMapping("/list")
     public Object getMomentList(
             @RequestParam(defaultValue = "1")Integer page,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "all") String type
     ) {
-        return BaseResponse.success("获取列表成功",momentService.getMomentList(page, size));
+        return BaseResponse.success("获取列表成功",momentService.getMomentList(page, size, type));
     }
 }

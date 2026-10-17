@@ -24,6 +24,6 @@ mybatis:
     map-underscore-to-camel-case: true
 
 file:
-  upload-path: /opt/restart-server/uploads
+  upload-path: /opt/restart-server/${file.upload-dir}
   #    access-url: https://api.treasurect.site/uploads/
-  access-url: http://124.222.46.122:8080/uploads/
+  upload-dir: uploads/

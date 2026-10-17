@@ -37,7 +37,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "http://127.0.0.1:5500",
                         "http://localhost:5500",
                         "http://127.0.0.1:5173",
-                        "http://localhost:5173"
+                        "http://localhost:5173",
+                        "https://www.treasurect.site",
+                        "https://treasurect.site",
+                        "http:",
+                        "https://treasurect.site"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*");

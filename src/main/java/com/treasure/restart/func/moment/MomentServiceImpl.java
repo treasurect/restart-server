@@ -5,6 +5,7 @@ import com.treasure.restart.dto.MomentPublishRequest;
 import com.treasure.restart.entity.Moment;
 import com.treasure.restart.entity.MomentImage;
 import com.treasure.restart.entity.MomentListRow;
+import com.treasure.restart.helper.UserContext;
 import com.treasure.restart.helper.exception.BusinessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +55,7 @@ public class MomentServiceImpl implements MomentService {
     }
 
     @Override
-    public MomentListResponse getMomentList(Integer page, Integer size) {
+    public MomentListResponse getMomentList(Integer page, Integer size, String type) {
         if (page == null || page < 1) {
             throw new BusinessException(400, "页码必须大于0");
         }
@@ -72,7 +73,7 @@ public class MomentServiceImpl implements MomentService {
         listResponse.setHasMore(page < totalPages);
 
         long offset = (long) (page - 1) * size;
-        List<MomentListRow> momentListRows = momentMapper.getList(offset, size);
+        List<MomentListRow> momentListRows = momentMapper.getList(offset, size, type, UserContext.getUserId());
         if (momentListRows == null || momentListRows.isEmpty()) {
             listResponse.setMomentList(Collections.emptyList());
             return listResponse;

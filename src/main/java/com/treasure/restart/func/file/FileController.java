@@ -23,13 +23,13 @@ import java.util.UUID;
 public class FileController {
 
     private final String uploadPath;
-    private final String accessUrl;
+    private final String uploadDir;
     public FileController(
             @Value("${file.upload-path}") String uploadPath,
-            @Value("${file.access-url}") String accessUrl
+            @Value("${file.upload-dir}") String uploadDir
     ){
         this.uploadPath = uploadPath;
-        this.accessUrl = accessUrl;
+        this.uploadDir = uploadDir;
     }
 
     @PostMapping("/upload")
@@ -70,7 +70,7 @@ public class FileController {
 
                 file.transferTo(target);
 
-                wholeUrls.add(accessUrl + fileName);
+                wholeUrls.add(uploadDir + fileName);
 
             } catch (IOException e) {
                 throw new BusinessException(500, "文件上传失败");
