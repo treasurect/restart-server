@@ -1,14 +1,14 @@
 package com.treasure.restart.func.file;
 
 import com.treasure.restart.base.BaseResponse;
+import com.treasure.restart.entity.HistoryItem;
 import com.treasure.restart.helper.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,12 +24,16 @@ public class FileController {
 
     private final String uploadPath;
     private final String uploadDir;
+    private final ObjectMapper objectMapper;
+
     public FileController(
             @Value("${file.upload-path}") String uploadPath,
-            @Value("${file.upload-dir}") String uploadDir
+            @Value("${file.upload-dir}") String uploadDir,
+            ObjectMapper objectMapper
     ){
         this.uploadPath = uploadPath;
         this.uploadDir = uploadDir;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/upload")
@@ -78,5 +82,25 @@ public class FileController {
         }
 
         return BaseResponse.success("上传成功", wholeUrls);
+    }
+
+    @GetMapping("/history/{region}")
+    public BaseResponse<List<HistoryItem>> getHistoryList(@PathVariable String region) {
+        String historyPath = switch (region) {
+            case "china" ->  "/opt/restart-server/data/history_china.json";
+            case "europe" ->  "/opt/restart-server/data/history_europe.json";
+            case "usa" ->  "/opt/restart-server/data/history_usa.json";
+            case "russia" ->  "/opt/restart-server/data/history_russia.json";
+            default -> throw new BusinessException(404,"不支持的数据类型");
+        };
+        try {
+            Path path = Paths.get(historyPath);
+            if (!path.toFile().exists()) throw  new BusinessException(404,"历史数据文件不存在");
+            List<HistoryItem> historyItems = objectMapper.readValue(path.toFile(), new TypeReference<List<HistoryItem>>() {
+            });
+            return BaseResponse.success("获取历史数据成功",historyItems);
+        } catch (Exception e) {
+            throw new BusinessException(500,"获取历史数据失败");
+        }
     }
 }

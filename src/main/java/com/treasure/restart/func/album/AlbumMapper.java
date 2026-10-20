@@ -1,5 +1,6 @@
 package com.treasure.restart.func.album;
 
+import com.treasure.restart.dto.AlbumItem;
 import com.treasure.restart.dto.AlbumListResponse;
 import com.treasure.restart.entity.MomentImage;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,9 +24,9 @@ public interface AlbumMapper {
         FROM moment_images mi
     INNER JOIN moments m ON mi.moment_id = m.id
     INNER JOIN sys_user u ON m.user_id = u.id
-    ORDER BY m.created_at DESC , mi.sort ASC 
+    ORDER BY m.created_at DESC , mi.sort ASC
     """)
-    List<AlbumListResponse.albumItemResponse> getAlbumList();
+    List<AlbumItem> getAlbumList();
 
     @Select("SELECT count(*) FROM moment_images")
     Long getCount();
