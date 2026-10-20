@@ -17,6 +17,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/file")
@@ -100,6 +102,7 @@ public class FileController {
             });
             return BaseResponse.success("获取历史数据成功",historyItems);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BusinessException(500,"获取历史数据失败");
         }
     }
