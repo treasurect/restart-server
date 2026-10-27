@@ -1,7 +1,7 @@
 package com.treasure.restart.func.more;
 
 import com.treasure.restart.base.BaseResponse;
-import com.treasure.restart.dto.AlbumItem;
+import com.treasure.restart.entity.AlbumItem;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

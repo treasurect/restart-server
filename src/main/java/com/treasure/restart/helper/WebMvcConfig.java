@@ -20,7 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
-                        "/api/user/loginPwd"
+                        "/api/user/loginPwd",
+                        "/api/ai/chatAsGuest"
                 );
     }
 

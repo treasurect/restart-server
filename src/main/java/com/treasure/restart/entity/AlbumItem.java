@@ -1,4 +1,4 @@
-package com.treasure.restart.dto;
+package com.treasure.restart.entity;
 
 import lombok.Data;
 

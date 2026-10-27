@@ -1,8 +1,6 @@
 package com.treasure.restart.func.album;
 
-import com.treasure.restart.dto.AlbumItem;
-import com.treasure.restart.dto.AlbumListResponse;
-import com.treasure.restart.entity.MomentImage;
+import com.treasure.restart.entity.AlbumItem;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
