@@ -1,13 +1,15 @@
-package com.treasure.restart.func.ai;
+package com.treasure.restart.func.ai.context;
 
 import com.treasure.restart.enums.AiMessageStatus;
 import com.treasure.restart.helper.LogHelper;
 import reactor.core.Disposable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AiStreamContext {
+/**
+ * 聊天状态以及终止管理
+ */
+public class AiStreamContextManager {
     private final AtomicReference<AiMessageStatus> status = new AtomicReference<>(AiMessageStatus.GENERATING);
     //    private final AtomicBoolean cancelled = new AtomicBoolean(false);
     private final StringBuilder content = new StringBuilder();

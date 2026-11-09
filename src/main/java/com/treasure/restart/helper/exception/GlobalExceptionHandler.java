@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,6 +30,11 @@ public class GlobalExceptionHandler {
                 .getDefaultMessage();
 
         return BaseResponse.error(400, message);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public BaseResponse<?> handleNoResourceException(NoResourceFoundException e) {
+        return BaseResponse.error(404, e.getMessage());
     }
 
     /**

@@ -72,6 +72,8 @@ CREATE TABLE IF NOT EXISTS ai_message
     conversation_id BIGINT      NOT NULL COMMENT '所属会话ID',
     role            VARCHAR(20) NOT NULL COMMENT '消息角色：user或assistant',
     content         MEDIUMTEXT  NOT NULL COMMENT '消息内容',
+    message_type    VARCHAR(30) NOT NULL DEFAULT 'text' COMMENT '消息类型：text、image、file、audio',
+    extra           JSON        NULL     COMMENT '扩展信息：图片地址、文件信息等',
     created_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status          VARCHAR(20) NOT NULL DEFAULT 'COMPLETED' COMMENT '消息状态：GENERATING、COMPLETED、CANCELLED、FAILED、TIMEOUT',
     INDEX idx_conversation_id (conversation_id, id)

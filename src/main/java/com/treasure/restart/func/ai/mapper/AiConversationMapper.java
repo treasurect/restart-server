@@ -1,4 +1,4 @@
-package com.treasure.restart.func.ai;
+package com.treasure.restart.func.ai.mapper;
 
 import com.treasure.restart.entity.AiConversation;
 import org.apache.ibatis.annotations.*;
@@ -18,7 +18,10 @@ public interface AiConversationMapper {
     int insertConversation(AiConversation aiConversation);
 
     @Select("""
-            SELECT id,user_id AS userId,title,created_at AS createdAt,updated_at AS updatedAt
+            SELECT id,user_id AS userId,title,
+            created_at AS createdAt,updated_at AS updatedAt,
+            summary,summary_upto_message_id AS summaryUptoMessageId,
+            summary_tokens AS summaryTokens,summary_updated_at AS summaryUpdatedAt
             FROM ai_conversation
             WHERE id = #{id} AND user_id = #{userId}
             LIMIT 1
@@ -26,7 +29,10 @@ public interface AiConversationMapper {
     AiConversation getCurrentConversation(@Param("id") Long id, @Param("userId") Long userId);
 
     @Select("""
-            SELECT id,user_id AS userId,title,created_at AS createdAt,updated_at AS updatedAt
+            SELECT id,user_id AS userId,title,
+            created_at AS createdAt,updated_at AS updatedAt,
+            summary,summary_upto_message_id AS summaryUptoMessageId,
+            summary_tokens AS summaryTokens,summary_updated_at AS summaryUpdatedAt
             FROM ai_conversation
             WHERE user_id = #{userId}
             ORDER BY updated_at DESC
@@ -46,6 +52,17 @@ public interface AiConversationMapper {
             WHERE id = #{id} AND user_id = #{userId}
             """)
     int updateUpdatedAt(@Param("id") Long id, @Param("userId") Long userId);
+
+    @Update("""
+            UPDATE ai_conversation
+            SET summary = #{summary},
+                summary_upto_message_id = #{newUptoMsgId},
+                summary_tokens = #{summaryTokens},
+                summary_updated_at = CURRENT_TIMESTAMP
+            WHERE id = #{id} AND user_id = #{userId} AND summary_upto_message_id = #{oldUptoMsgId}
+            """)
+    int updateSummary(@Param("id") Long id, @Param("userId") Long userId, @Param("summary") String summary,
+                      @Param("newUptoMsgId") Long newUptoMsgId, @Param("summaryTokens") int summaryTokens, @Param("oldUptoMsgId") Long oldUptoMsgId);
 
     @Delete("""
             DELETE FROM ai_conversation
